@@ -2,20 +2,53 @@
 #include "fmgr.h"
 #include <fuzzy.h>
 
-PG_FUNCTION_INFO_V1(ssdeep_hash_generate);
+PG_MODULE_MAGIC;
 
-Datum ssdeep_hash_generate(PG_FUNCTION_ARGS) {
+PG_FUNCTION_INFO_V1(pg_fuzzy_hash);
+Datum pg_fuzzy_hash(PG_FUNCTION_ARGS);
+
+Datum pg_fuzzy_hash(PG_FUNCTION_ARGS) {
   text *pg_story = PG_GETARG_TEXT_P(0);
-  size_t story_length = VARSIZE(pg_story) - VARHDRSZ;
-  unsigned char *story = (unsigned char *) palloc(story_length + 1);
+  int pg_story_size = VARSIZE(pg_story);
+
   char *hash = (char *) palloc(FUZZY_MAX_RESULT);
+  text *pg_hash;
+  int hash_length;
 
-  memcpy(story, VARDATA(pg_story), story_length);
-  story[story_length] = '\0';
+  fuzzy_hash_buf((unsigned char *) VARDATA(pg_story), pg_story_size, hash);
 
-  fuzzy_hash_buf(story, story_length, hash);
+  hash_length = strlen(hash);
+  pg_hash = (text *) palloc(hash_length);
+  VARATT_SIZEP(pg_hash) = hash_length;
+  memcpy(VARDATA(pg_hash), hash, hash_length);
 
-  pfree(story);
+  pfree(hash);
 
-  PG_RETURN_CSTRING(story);
+  PG_RETURN_TEXT_P(pg_hash);
 }
+// 
+// CREATE OR REPLACE FUNCTION fuzzy_hash(TEXT) RETURNS TEXT AS 'ssdeep_psql.so', 'pg_fuzzy_hash' LANGUAGE 'C';
+//
+
+PG_FUNCTION_INFO_V1(pg_fuzzy_compare);
+Datum pg_fuzzy_compare(PG_FUNCTION_ARGS);
+
+Datum pg_fuzzy_compare(PG_FUNCTION_ARGS) {
+  char *hash1, *hash2;
+  text *arg1 = PG_GETARG_TEXT_P(0);
+  text *arg2 = PG_GETARG_TEXT_P(1);
+
+  hash1 = (char *) palloc(VARSIZE(arg1));
+  hash2 = (char *) palloc(VARSIZE(arg2));
+
+  memcpy(hash1, VARDATA(arg1), VARSIZE(arg1));
+  memcpy(hash2, VARDATA(arg2), VARSIZE(arg2));
+
+  ereport(INFO, (errcode(ERRCODE_SUCCESSFUL_COMPLETION), errmsg("Hash 1 Value: %s", hash1)));
+  ereport(INFO, (errcode(ERRCODE_SUCCESSFUL_COMPLETION), errmsg("Hash 2 Value: %s", hash2)));
+
+  PG_RETURN_INT32((int32) fuzzy_compare(hash1, hash2));
+}
+// 
+// CREATE OR REPLACE FUNCTION fuzzy_compare(TEXT, TEXT) RETURNS INTEGER AS 'ssdeep_psql.so', 'pg_fuzzy_compare' LANGUAGE 'C';
+//

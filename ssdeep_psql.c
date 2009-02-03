@@ -19,7 +19,7 @@ Datum pg_fuzzy_hash(PG_FUNCTION_ARGS) {
 
   hash_length = strlen(hash);
   pg_hash = (text *) palloc(hash_length);
-  VARATT_SIZEP(pg_hash) = hash_length;
+  SET_VARSIZE(pg_hash, hash_length);
   memcpy(VARDATA(pg_hash), hash, hash_length);
 
   pfree(hash);
@@ -43,9 +43,6 @@ Datum pg_fuzzy_compare(PG_FUNCTION_ARGS) {
 
   memcpy(hash1, VARDATA(arg1), VARSIZE(arg1));
   memcpy(hash2, VARDATA(arg2), VARSIZE(arg2));
-
-  ereport(INFO, (errcode(ERRCODE_SUCCESSFUL_COMPLETION), errmsg("Hash 1 Value: %s", hash1)));
-  ereport(INFO, (errcode(ERRCODE_SUCCESSFUL_COMPLETION), errmsg("Hash 2 Value: %s", hash2)));
 
   PG_RETURN_INT32((int32) fuzzy_compare(hash1, hash2));
 }

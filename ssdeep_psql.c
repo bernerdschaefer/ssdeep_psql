@@ -56,3 +56,19 @@ Datum pg_fuzzy_compare(PG_FUNCTION_ARGS) {
 // 
 // CREATE OR REPLACE FUNCTION fuzzy_compare(TEXT, TEXT) RETURNS INTEGER AS 'ssdeep_psql.so', 'pg_fuzzy_compare' LANGUAGE 'C';
 //
+
+PG_FUNCTION_INFO_V1(pg_fuzzy_hash_compare);
+Datum pg_fuzzy_hash_compare(PG_FUNCTION_ARGS);
+
+Datum pg_fuzzy_hash_compare(PG_FUNCTION_ARGS) {
+  text *hash1 = PG_GETARG_TEXT_P(0);
+  text *hash2 = PG_GETARG_TEXT_P(1);
+  int32 score;
+
+  score = (int32) fuzzy_compare((char *) VARDATA(hash1), (char *) VARDATA(hash2));
+
+  PG_RETURN_INT32(score);
+}
+// 
+// CREATE OR REPLACE FUNCTION fuzzy_hash_compare(TEXT, TEXT) RETURNS INTEGER AS 'ssdeep_psql.so', 'pg_fuzzy_hash_compare' LANGUAGE 'C';
+//

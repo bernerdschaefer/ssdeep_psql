@@ -37,14 +37,20 @@ Datum pg_fuzzy_compare(PG_FUNCTION_ARGS) {
   char *hash1, *hash2;
   text *arg1 = PG_GETARG_TEXT_P(0);
   text *arg2 = PG_GETARG_TEXT_P(1);
+  int32 score;
 
-  hash1 = (char *) palloc(VARSIZE(arg1));
-  hash2 = (char *) palloc(VARSIZE(arg2));
+  hash1 = (char *) palloc(FUZZY_MAX_RESULT);
+  hash2 = (char *) palloc(FUZZY_MAX_RESULT);
 
-  memcpy(hash1, VARDATA(arg1), VARSIZE(arg1));
-  memcpy(hash2, VARDATA(arg2), VARSIZE(arg2));
+  fuzzy_hash_buf((unsigned char *) VARDATA(arg1), VARSIZE(arg1), hash1);
+  fuzzy_hash_buf((unsigned char *) VARDATA(arg2), VARSIZE(arg2), hash2);
 
-  PG_RETURN_INT32((int32) fuzzy_compare(hash1, hash2));
+  score = (int32) fuzzy_compare(hash1, hash2);
+
+  pfree(hash1);
+  pfree(hash2);
+
+  PG_RETURN_INT32(score);
 }
 // 
 // CREATE OR REPLACE FUNCTION fuzzy_compare(TEXT, TEXT) RETURNS INTEGER AS 'ssdeep_psql.so', 'pg_fuzzy_compare' LANGUAGE 'C';

@@ -1,0 +1,23 @@
+Requirements
+============
+
+You will need to download ssdeep (tested with 2.1 and 2.5) from http://ssdeep.sourceforge.net/ and then configure and make as usual.
+
+Installation
+============
+
+You will want to clone this repository in the contrib folder of your postgres source folder, and then you should be able to run "make" and "make install".
+
+To expose the ssdeep functions in your database, you'll need to issue the following statements:
+
+  CREATE OR REPLACE FUNCTION fuzzy_hash(TEXT) RETURNS TEXT AS 'ssdeep_psql.so', 'pg_fuzzy_hash' LANGUAGE 'C';
+  CREATE OR REPLACE FUNCTION fuzzy_compare(TEXT, TEXT) RETURNS INTEGER AS 'ssdeep_psql.so', 'pg_fuzzy_compare' LANGUAGE 'C';
+
+Usage
+=====
+
+  # select fuzzy_hash('john');
+   fuzzy_hash 
+   ------------
+    3:Uvl
+    (1 row)

@@ -8,18 +8,19 @@ PG_FUNCTION_INFO_V1(pg_fuzzy_hash);
 Datum pg_fuzzy_hash(PG_FUNCTION_ARGS);
 
 Datum pg_fuzzy_hash(PG_FUNCTION_ARGS) {
-  text *pg_story = PG_GETARG_TEXT_P(0);
-  int pg_story_size = VARSIZE(pg_story);
+  text *arg = PG_GETARG_TEXT_P(0);
+  int arg_size = VARSIZE(arg) - VARHDRSZ;
 
   char *hash = (char *) palloc(FUZZY_MAX_RESULT);
   text *pg_hash;
   int hash_length;
 
-  fuzzy_hash_buf((unsigned char *) VARDATA(pg_story), pg_story_size, hash);
+  fuzzy_hash_buf((unsigned char *) VARDATA(arg), arg_size, hash);
 
   hash_length = strlen(hash);
   pg_hash = (text *) palloc(hash_length);
-  SET_VARSIZE(pg_hash, hash_length);
+
+  SET_VARSIZE(pg_hash, hash_length+VARHDRSZ);
   memcpy(VARDATA(pg_hash), hash, hash_length);
 
   pfree(hash);
@@ -42,8 +43,8 @@ Datum pg_fuzzy_compare(PG_FUNCTION_ARGS) {
   hash1 = (char *) palloc(FUZZY_MAX_RESULT);
   hash2 = (char *) palloc(FUZZY_MAX_RESULT);
 
-  fuzzy_hash_buf((unsigned char *) VARDATA(arg1), VARSIZE(arg1), hash1);
-  fuzzy_hash_buf((unsigned char *) VARDATA(arg2), VARSIZE(arg2), hash2);
+  fuzzy_hash_buf((unsigned char *) VARDATA(arg1), VARSIZE(arg1)-VARHDRSZ, hash1);
+  fuzzy_hash_buf((unsigned char *) VARDATA(arg2), VARSIZE(arg2)-VARHDRSZ, hash2);
 
   score = (int32) fuzzy_compare(hash1, hash2);
 

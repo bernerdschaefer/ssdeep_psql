@@ -1,7 +1,27 @@
 Requirements
 ============
 
-You will need to download ssdeep (tested with 2.1 and 2.5) from http://ssdeep.sourceforge.net/ and then configure and make as usual.
+On Debian Wheezy:
+
+  sudo apt-get install postgresql-server-dev-9.1 postgresql-server-dev-all ssdeep libfuzzy2 libfuzzy-dev
+
+  git clone https://github.com/adunstan/postgresql-dev.git
+  
+Copy the content of `postgresql-dev` directory to `/usr/lib/postgresql/9.1/lib/pgxs`, overwriting duplicate files (not entire directories).
+
+Clone `ssdeep_psql` to `/usr/lib/postgresql/9.1/lib/pgxs/contrib`.
+
+Edit `/usr/lib/postgresql/9.1/lib/pgxs/src/Makefile.global` and update the `VPATH` build address to point to an existing address (e.g. `abs_top_srcdir = /usr/lib/postgresql/9.1/lib/pgxs`). 
+
+Go to `/usr/lib/postgresql/9.1/lib/pgxs` and run `./configure`.
+
+Go to `/usr/lib/postgresql/9.1/lib/pgxs/contrib/ssdeep_psql`, and then:
+
+  make
+  
+  make install
+  
+You should now have `/usr/local/pgsql/lib/ssdeep_psql.so` installed.
 
 Installation
 ============

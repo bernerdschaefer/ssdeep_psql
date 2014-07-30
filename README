@@ -1,17 +1,24 @@
-Requirements
+Requirements (for Debian Wheezy)
 ============
 
-On Debian Wheezy:
+Install the package requirements:
 
-  sudo apt-get install postgresql-server-dev-9.1 postgresql-server-dev-all ssdeep libfuzzy2 libfuzzy-dev
+  sudo apt-get install postgresql-server-dev-9.1 postgresql-server-dev-all ssdeep libfuzzy2 libfuzzy-dev postgresql-contrib postgresql-contrib-9.1
+
+Clone the Postgres plugin dev repository to get access to global makefiles and configure script:
 
   git clone https://github.com/adunstan/postgresql-dev.git
   
-Copy the content of `postgresql-dev` directory to `/usr/lib/postgresql/9.1/lib/pgxs`, overwriting duplicate files (not entire directories).
+Then copy the content of `postgresql-dev` directory to `/usr/lib/postgresql/9.1/lib/pgxs`, overwriting duplicate files (not entire directories).
+
+Installation
+============
 
 Clone `ssdeep_psql` to `/usr/lib/postgresql/9.1/lib/pgxs/contrib`.
 
-Edit `/usr/lib/postgresql/9.1/lib/pgxs/src/Makefile.global` and update the `VPATH` build address to point to an existing address (e.g. `abs_top_srcdir = /usr/lib/postgresql/9.1/lib/pgxs`). 
+Edit `/usr/lib/postgresql/9.1/lib/pgxs/src/Makefile.global`:
+- Update the `VPATH` build address to point to an existing path (e.g. `abs_top_srcdir = /usr/lib/postgresql/9.1/lib/pgxs`). 
+- Update the install prefix to point to Postgresql plugin path (prefix := /usr/lib/postgresql/9.1)
 
 Go to `/usr/lib/postgresql/9.1/lib/pgxs` and run `./configure`.
 
@@ -21,12 +28,7 @@ Go to `/usr/lib/postgresql/9.1/lib/pgxs/contrib/ssdeep_psql`, and then:
   
   make install
   
-You should now have `/usr/local/pgsql/lib/ssdeep_psql.so` installed.
-
-Installation
-============
-
-You will want to clone this repository in the contrib folder of your postgres source folder, and then you should be able to run "make" and "make install".
+You should now have `/usr/lib/postgresql/9.1/lib/ssdeep_psql.so` installed.
 
 To expose the ssdeep functions in your database, you'll need to issue the following statements:
 

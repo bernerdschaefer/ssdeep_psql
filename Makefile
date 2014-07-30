@@ -1,5 +1,5 @@
 
-PG_CPPFLAGS = -I. -I/usr/include -I/usr/include/postgresql/9.1/server
+PG_CPPFLAGS = -I. -I/usr/include -I$(shell pg_config --includedir-server)
 
 MODULE_big = ssdeep_psql
 OBJS = ssdeep_psql.o

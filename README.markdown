@@ -3,9 +3,11 @@ Requirements (for Ubuntu 14.04 Trusty and PostgreSQL 9.4.1)
 
 Install the package requirements:
 
-  apt-get install -y postgresql postgresql-client postgresql-server-dev-all postgresql-contrib postgresql-client-common postgresql-common
+``` Shell
+apt-get install -y postgresql postgresql-client postgresql-server-dev-all postgresql-contrib postgresql-client-common postgresql-common
+```
 
-Download and untar in a temporary directory (e.g. ~/temp) the source code of the version of PostgreSQL that you are using from [the official website](http://www.postgresql.org/ftp/source).
+Download and untar in a temporary directory (e.g. `~/temp`) the source code of the version of PostgreSQL that you are using from [the official website](http://www.postgresql.org/ftp/source).
 
 Installation
 ============

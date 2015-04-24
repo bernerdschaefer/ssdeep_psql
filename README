@@ -5,7 +5,7 @@ Install the package requirements:
 
   apt-get install -y postgresql postgresql-client postgresql-server-dev-all postgresql-contrib postgresql-client-common postgresql-common
 
-Download and untar in a temporary directory (e.g. ~/temp) the source code of the version of PostgreSQL that you are using from [the official source repository](http://www.postgresql.org/ftp/source/).
+Download and untar in a temporary directory (e.g. ~/temp) the source code of the version of PostgreSQL that you are using from (the official source repository)[http://www.postgresql.org/ftp/source/].
 
 Installation
 ============

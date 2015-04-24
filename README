@@ -1,34 +1,26 @@
-Requirements (for Debian Wheezy)
+Requirements (for Ubuntu 14.04 Trusty)
 ============
 
 Install the package requirements:
 
-  sudo apt-get install postgresql-server-dev-9.1 postgresql-server-dev-all ssdeep libfuzzy2 libfuzzy-dev postgresql-contrib postgresql-contrib-9.1
+  apt-get install -y postgresql postgresql-client postgresql-server-dev-all postgresql-contrib postgresql-client-common postgresql-common
 
-Clone the Postgres plugin dev repository to get access to global makefiles and configure script:
-
-  git clone https://github.com/adunstan/postgresql-dev.git
-  
-Then copy the content of `postgresql-dev` directory to `/usr/lib/postgresql/9.1/lib/pgxs`, overwriting duplicate files (not entire directories).
+Download and untar in a temporary directory (e.g. ~/temp) the source code of the version of PostgreSQL that you are using from [the official source repository](http://www.postgresql.org/ftp/source/).
 
 Installation
 ============
 
-Clone `ssdeep_psql` to `/usr/lib/postgresql/9.1/lib/pgxs/contrib`.
+Clone `ssdeep_psql` to `~/temp/postgresql-9.4.1/contrib/`.
 
-Edit `/usr/lib/postgresql/9.1/lib/pgxs/src/Makefile.global`:
-- Update the `VPATH` build address to point to an existing path (e.g. `abs_top_srcdir = /usr/lib/postgresql/9.1/lib/pgxs`). 
-- Update the install prefix to point to Postgresql plugin path (prefix := /usr/lib/postgresql/9.1)
+Go to `~/temp/postgresql-9.4.1` and run `./configure`.
 
-Go to `/usr/lib/postgresql/9.1/lib/pgxs` and run `./configure`.
-
-Go to `/usr/lib/postgresql/9.1/lib/pgxs/contrib/ssdeep_psql`, and then:
+Go to `~/temp/postgresql-9.4.1/contrib/ssdeep_psql`, and then:
 
   make
   
   make install
   
-You should now have `/usr/lib/postgresql/9.1/lib/ssdeep_psql.so` installed.
+You should now have `/usr/lib/postgresql/9.4/lib/ssdeep_psql.so` installed.
 
 To expose the ssdeep functions in your database, you'll need to issue the following statements:
 

@@ -34,48 +34,59 @@ CREATE OR REPLACE FUNCTION fuzzy_hash_compare(TEXT, TEXT) RETURNS INTEGER AS 'ss
 Usage
 =====
 
-ssdeep_psql exposes three functions for working with fuzzy hashes: fuzzy_hash, fuzzy_compare, and fuzzy_hash_compare:
+`ssdeep_psql` exposes three functions for working with fuzzy hashes: `fuzzy_hash`, `fuzzy_compare`, and `fuzzy_hash_compare`:
 
-  # select fuzzy_hash('john');
-   fuzzy_hash
-   ------------
-    3:Uvl
+```SQL
+# SELECT fuzzy_hash('john');
+ fuzzy_hash
+ ------------
+ 3:Uvl
 
-  # select fuzzy_compare('lorem ipsum dolor sit amet', 'lorem ipsum dolor sit amet');
-   fuzzy_compare
-   ---------------
-                9
+# SELECT fuzzy_compare('lorem ipsum dolor sit amet', 'lorem ipsum dolor sit amet');
+ fuzzy_compare
+ ---------------
+              9
 
-  # select fuzzy_hash_compare('3:JBo8MRwRn:J3PR', '3:JBo8MRwx:J3Px');
-   fuzzy_hash_compare
-   --------------------
-                     8
+# SELECT fuzzy_hash_compare('3:JBo8MRwRn:J3PR', '3:JBo8MRwx:J3Px');
+ fuzzy_hash_compare
+ --------------------
+                   8
+```
 
 Here's a suggested workflow for using ssdeep_psql:
 
-  CREATE TABLE "stories" ("id" SERIAL, "body" TEXT, "hash" TEXT);
+```SQL
+CREATE TABLE "stories" ("id" SERIAL, "body" TEXT, "hash" TEXT);
 
-  CREATE OR REPLACE FUNCTION set_fuzzy_hash() RETURNS TRIGGER AS $$
-  BEGIN
-      NEW.hash := fuzzy_hash(NEW.body);
-      RETURN NEW;
-  END;
-  $$ LANGUAGE plpgsql;
-  CREATE TRIGGER "set_fuzzy_hash_for_body_on_insert" BEFORE INSERT ON "stories"
-    FOR EACH ROW EXECUTE PROCEDURE set_fuzzy_hash();
-  CREATE TRIGGER "set_fuzzy_hash_for_body_on_update" BEFORE UPDATE ON "stories"
-    FOR EACH ROW EXECUTE PROCEDURE set_fuzzy_hash();
+CREATE OR REPLACE FUNCTION set_fuzzy_hash() RETURNS TRIGGER AS $$
+BEGIN
+    NEW.hash := fuzzy_hash(NEW.body);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
-  INSERT INTO "stories" ("body") VALUES ('Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.');
-  INSERT INTO "stories" ("body") VALUES ('Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.');
+CREATE TRIGGER "set_fuzzy_hash_for_body_on_insert" BEFORE INSERT ON "stories"
+  FOR EACH ROW EXECUTE PROCEDURE set_fuzzy_hash();
+CREATE TRIGGER "set_fuzzy_hash_for_body_on_update" BEFORE UPDATE ON "stories"
+  FOR EACH ROW EXECUTE PROCEDURE set_fuzzy_hash();
 
-  SELECT id, fuzzy_compare(body, 'Lorem ipsum dolor sit amet') as score from "stories" ORDER BY fuzzy_compare(body, 'Lorem ipsum dolor sit amet') DESC LIMIT 1;
+INSERT INTO "stories" ("body") VALUES ('Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.');
 
-  -- or, much faster
-  SELECT id, fuzzy_hash_compare(hash, fuzzy_hash('Lorem ipsum dolor sit amet')) as score from "stories"
+INSERT INTO "stories" ("body") VALUES ('Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.');
+
+SELECT id, fuzzy_compare(body, 'Lorem ipsum dolor sit amet') as score from "stories" ORDER BY fuzzy_compare(body, 'Lorem ipsum dolor sit amet') DESC LIMIT 1;
+```
+
+Or, much faster:
+
+```SQL
+SELECT id, fuzzy_hash_compare(hash, fuzzy_hash('Lorem ipsum dolor sit amet')) as score from "stories"
   ORDER BY fuzzy_hash_compare(hash, fuzzy_hash('Lorem ipsum dolor sit amet')) DESC LIMIT 1;
+```
 
-  -- and again, assuming you've calculated your search text's hash already (with, say, ssdeep_ruby)
-  SELECT id, fuzzy_hash_compare(hash, '3:f4oo8MRwRn:f4kPR') as score from "stories"
+And again, assuming you've calculated your search text's hash already (with, say, ssdeep_ruby):
+
+```SQL
+SELECT id, fuzzy_hash_compare(hash, '3:f4oo8MRwRn:f4kPR') as score from "stories"
   ORDER BY fuzzy_hash_compare(hash, '3:f4oo8MRwRn:f4kPR') DESC LIMIT 1;
-
+```

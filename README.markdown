@@ -16,7 +16,7 @@ Go to `~/temp/postgresql-9.4.1` and run `./configure`.
 
 Go to `~/temp/postgresql-9.4.1/contrib/ssdeep_psql`, and then:
 
-```bash
+```Shell
 make
 make install
 ```
@@ -36,7 +36,7 @@ Usage
 
 `ssdeep_psql` exposes three functions for working with fuzzy hashes: `fuzzy_hash`, `fuzzy_compare`, and `fuzzy_hash_compare`:
 
-```SQL
+```
 # SELECT fuzzy_hash('john');
  fuzzy_hash
  ------------
@@ -55,7 +55,7 @@ Usage
 
 Here's a suggested workflow for using ssdeep_psql:
 
-```SQL
+```PLpgSQL
 CREATE TABLE "stories" ("id" SERIAL, "body" TEXT, "hash" TEXT);
 
 CREATE OR REPLACE FUNCTION set_fuzzy_hash() RETURNS TRIGGER AS $$
@@ -74,19 +74,19 @@ INSERT INTO "stories" ("body") VALUES ('Lorem ipsum dolor sit amet, consectetur 
 
 INSERT INTO "stories" ("body") VALUES ('Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.');
 
-SELECT id, fuzzy_compare(body, 'Lorem ipsum dolor sit amet') as score from "stories" ORDER BY fuzzy_compare(body, 'Lorem ipsum dolor sit amet') DESC LIMIT 1;
+SELECT id, fuzzy_compare(body, 'Lorem ipsum dolor sit amet') AS score FROM "stories" ORDER BY fuzzy_compare(body, 'Lorem ipsum dolor sit amet') DESC LIMIT 1;
 ```
 
 Or, much faster:
 
 ```SQL
-SELECT id, fuzzy_hash_compare(hash, fuzzy_hash('Lorem ipsum dolor sit amet')) as score from "stories"
+SELECT id, fuzzy_hash_compare(hash, fuzzy_hash('Lorem ipsum dolor sit amet')) AS score FROM "stories"
   ORDER BY fuzzy_hash_compare(hash, fuzzy_hash('Lorem ipsum dolor sit amet')) DESC LIMIT 1;
 ```
 
 And again, assuming you've calculated your search text's hash already (with, say, ssdeep_ruby):
 
 ```SQL
-SELECT id, fuzzy_hash_compare(hash, '3:f4oo8MRwRn:f4kPR') as score from "stories"
+SELECT id, fuzzy_hash_compare(hash, '3:f4oo8MRwRn:f4kPR') AS score FROM "stories"
   ORDER BY fuzzy_hash_compare(hash, '3:f4oo8MRwRn:f4kPR') DESC LIMIT 1;
 ```

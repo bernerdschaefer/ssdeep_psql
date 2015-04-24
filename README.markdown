@@ -1,4 +1,4 @@
-Requirements (for Ubuntu 14.04 Trusty)
+Requirements (for Ubuntu 14.04 Trusty and PostgreSQL 9.4.1)
 ============
 
 Install the package requirements:
@@ -38,22 +38,22 @@ Usage
 
 ```
 # SELECT fuzzy_hash('john');
- fuzzy_hash
+  fuzzy_hash
  ------------
- 3:Uvl
+  3:Uvl
 
 # SELECT fuzzy_compare('lorem ipsum dolor sit amet', 'lorem ipsum dolor sit amet');
- fuzzy_compare
+  fuzzy_compare
  ---------------
               9
 
 # SELECT fuzzy_hash_compare('3:JBo8MRwRn:J3PR', '3:JBo8MRwx:J3Px');
- fuzzy_hash_compare
+  fuzzy_hash_compare
  --------------------
                    8
 ```
 
-Here's a suggested workflow for using ssdeep_psql:
+Here's a suggested workflow for using `ssdeep_psql`:
 
 ```PLpgSQL
 CREATE TABLE "stories" ("id" SERIAL, "body" TEXT, "hash" TEXT);

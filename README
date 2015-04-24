@@ -20,13 +20,13 @@ Go to `~/temp/postgresql-9.4.1/contrib/ssdeep_psql`, and then:
   
   make install
   
-You should now have `/usr/lib/postgresql/9.4/lib/ssdeep_psql.so` installed.
+You should now have `/usr/lib/postgresql/9.4/lib/ssdeep_psql.so` installed. If not, have a look under `/usr/local/pgsql/lib/ssdeep_psql.so` and move the file to the appropriate address.
 
 To expose the ssdeep functions in your database, you'll need to issue the following statements:
 
-  CREATE OR REPLACE FUNCTION fuzzy_hash(TEXT) RETURNS TEXT AS 'ssdeep_psql.so', 'pg_fuzzy_hash' LANGUAGE 'C';
-  CREATE OR REPLACE FUNCTION fuzzy_compare(TEXT, TEXT) RETURNS INTEGER AS 'ssdeep_psql.so', 'pg_fuzzy_compare' LANGUAGE 'C';
-  CREATE OR REPLACE FUNCTION fuzzy_hash_compare(TEXT, TEXT) RETURNS INTEGER AS 'ssdeep_psql.so', 'pg_fuzzy_hash_compare' LANGUAGE 'C';
+  CREATE OR REPLACE FUNCTION fuzzy_hash(TEXT) RETURNS TEXT AS 'ssdeep_psql.so', 'pg_fuzzy_hash' LANGUAGE C;
+  CREATE OR REPLACE FUNCTION fuzzy_compare(TEXT, TEXT) RETURNS INTEGER AS 'ssdeep_psql.so', 'pg_fuzzy_compare' LANGUAGE C;
+  CREATE OR REPLACE FUNCTION fuzzy_hash_compare(TEXT, TEXT) RETURNS INTEGER AS 'ssdeep_psql.so', 'pg_fuzzy_hash_compare' LANGUAGE C;
 
 Usage
 =====
